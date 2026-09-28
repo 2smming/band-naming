@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// 밴드 멤버끼리 쓰는 앱이라 로그인 없이 접근한다.
+// 멤버마다 문서 하나, 회차 목록은 _meta 문서. 서로 결과를 봐야 해서 목록 조회까지 열고, 삭제만 막는다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /bandtaste/{member} {
+      allow get, list, create, update: if true;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

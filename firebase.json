@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": ["**/.*", "**/node_modules/**"],
+    "predeploy": ["npm ci", "npm run build"]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}
