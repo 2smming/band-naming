@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { loadStore, loadMeta, saveMeta, saveEntry } from "./store.js";
+import { loadStore, saveEntry } from "./store.js";
 
 const FOOD_Q = [
   { id: "f01", tag: "탕수육", prompt: "탕수육은", a: "부어 먹기", b: "찍어 먹기" },
@@ -96,15 +96,15 @@ const MEMBERS = [
 ];
 
 const SECTIONS = [
-  { key: "food", label: "음식 밸런스 게임", desc: "먹는 거 취향 20개", type: "balance", set: FOOD_Q },
-  { key: "song", label: "어떤 음악을 하고 싶어요?", desc: "키워드 5개랑 떠오르는 곡", type: "song" },
-  { key: "lastmeal", label: "마지막 한 끼", desc: "죽기 전에 먹고 싶은 음식", type: "meal" },
-  { key: "likes", label: "내 취향 5개", desc: "편하게 고르는 일상 취향", type: "likes" },
-  { key: "senses", label: "감각 취향", desc: "시간대, 계절, 날씨, 향", type: "senses" },
-  { key: "life", label: "인생 셋", desc: "무인도, 인생 노래, 인생 영화", type: "life" },
-  { key: "values", label: "가치 단어 5개", desc: "60개 중 나랑 가까운 5개", type: "chips" },
-  { key: "colors", label: "좋아하는 색 3개", desc: "팔레트에서 끌리는 색 3개", type: "colors" },
-  { key: "mix", label: "글자와 숫자", desc: "숫자, 알파벳, 자음 하나씩", type: "mix" },
+  { key: "food", label: "음식 밸런스 게임", short: "음식 밸런스", icon: "🍜", desc: "먹는 거 취향 20개", type: "balance", set: FOOD_Q },
+  { key: "song", label: "어떤 음악을 하고 싶어요?", short: "하고 싶은 음악", icon: "🎵", desc: "키워드 5개랑 떠오르는 곡", type: "song" },
+  { key: "lastmeal", label: "마지막 한 끼", short: "마지막 한 끼", icon: "🍽️", desc: "죽기 전에 먹고 싶은 음식", type: "meal" },
+  { key: "likes", label: "내 취향 5개", short: "내 취향", icon: "💜", desc: "편하게 고르는 일상 취향", type: "likes" },
+  { key: "senses", label: "감각 취향", short: "감각 취향", icon: "🌙", desc: "시간대, 계절, 날씨, 향", type: "senses" },
+  { key: "life", label: "인생 셋", short: "인생 셋", icon: "🏝️", desc: "무인도, 인생 노래, 인생 영화", type: "life" },
+  { key: "values", label: "가치 단어 5개", short: "가치 단어", icon: "💎", desc: "60개 중 나랑 가까운 5개", type: "chips" },
+  { key: "colors", label: "좋아하는 색 3개", short: "좋아하는 색", icon: "🎨", desc: "팔레트에서 끌리는 색 3개", type: "colors" },
+  { key: "mix", label: "글자와 숫자", short: "글자와 숫자", icon: "🔤", desc: "숫자, 알파벳, 자음 하나씩", type: "mix" },
 ];
 
 const FONT_URLS = [
@@ -247,6 +247,36 @@ const CSS = `
 .bt-list:hover { border-color: rgba(91,61,245,.45); background: rgba(91,61,245,.05); }
 .bt-list strong { display: block; font-size: 15.5px; font-weight: 600; letter-spacing: -.025em; margin-bottom: 3px; }
 .bt-list.done { border-color: rgba(91,61,245,.38); background: rgba(91,61,245,.05); }
+
+.bt-tabs { display: flex; gap: 6px; margin: 4px 0 12px; }
+.bt-tabs button {
+  border: 1px solid var(--line); background: transparent; color: var(--mute);
+  border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: all .14s ease;
+}
+.bt-tabs button b { font-weight: 700; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.bt-tabs button.on { background: var(--led); border-color: var(--led); color: #fff; }
+.bt-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bt-tile {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  min-width: 0; padding: 12px 10px 11px; text-align: left;
+  border: 1px solid var(--line); background: rgba(27,20,54,.025); border-radius: 14px;
+  color: var(--cream); font-family: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease;
+}
+.bt-tile:hover { border-color: rgba(91,61,245,.45); background: rgba(91,61,245,.05); }
+.bt-tile .ico { font-size: 22px; line-height: 1.2; }
+.bt-tile .nm { font-size: 13.5px; font-weight: 700; letter-spacing: -.03em; line-height: 1.3; word-break: keep-all; }
+.bt-tile .st { font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.bt-tile .bt-mini { width: 100%; margin-top: 4px; }
+.bt-tile.done { border-color: rgba(91,61,245,.38); background: rgba(91,61,245,.07); }
+.bt-tile.done .st { color: var(--led); font-weight: 600; }
+.bt-tile .chk {
+  position: absolute; top: 8px; right: 8px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--led); color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.bt-empty { font-size: 13.5px; color: var(--faint); padding: 18px 0; text-align: center; }
+@media (max-width: 340px) { .bt-tiles { grid-template-columns: repeat(2, 1fr); } }
 .bt-side { display: flex; gap: 10px; align-items: baseline; padding: 5px 0; font-size: 14px; line-height: 1.5; }
 .bt-side span:first-child { width: 100px; flex-shrink: 0; font-weight: 600; }
 .bt-hit { color: #33199E; background: var(--pop); border-radius: 5px; padding: 1px 6px; }
@@ -330,10 +360,20 @@ const readPick = (E, key) => {
   return first ? { letter: first[0], item: first[1], memo: "" } : { letter: "", item: "", memo: "" };
 };
 
+// 고른 이름은 이 브라우저에 기억해 두고, 다음에 열면 바로 내 화면으로 간다.
+const ME_KEY = "bandtaste:me";
+const savedMe = () => {
+  try {
+    const v = localStorage.getItem(ME_KEY) || "";
+    return MEMBERS.some((m) => m.name === v) ? v : "";
+  } catch (e) { return ""; }
+};
+
 export default function TasteArchive() {
-  const [screen, setScreen] = useState("intro");
+  const [name, setName] = useState(savedMe);
+  const [screen, setScreen] = useState(() => (savedMe() ? "hub" : "intro"));
   const [section, setSection] = useState(null);
-  const [name, setName] = useState("");
+  const [hubTab, setHubTab] = useState("all");
   const [idx, setIdx] = useState(0);
   const [draft, setDraft] = useState({});
   const [chipDraft, setChipDraft] = useState([]);
@@ -345,10 +385,15 @@ export default function TasteArchive() {
   const [songDraft, setSongDraft] = useState({ words: [], title: "" });
   const [mixDraft, setMixDraft] = useState({ num: "", en: { letter: "", item: "", memo: "" }, ko: { letter: "", item: "", memo: "" } });
   const [store, setStore] = useState({ rounds: [], activeId: null });
-  const [openRound, setOpenRound] = useState(null);
-  const [openMember, setOpenMember] = useState(null);
   const [loading, setLoading] = useState(true);
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    try {
+      if (name) localStorage.setItem(ME_KEY, name);
+      else localStorage.removeItem(ME_KEY);
+    } catch (e) { /* 기억 못 해도 앱은 그대로 쓸 수 있다 */ }
+  }, [name]);
 
   useEffect(() => {
     FONT_URLS.forEach((href) => {
@@ -381,6 +426,7 @@ export default function TasteArchive() {
 
   const saveFields = async (fields) => {
     const me = name.trim();
+    if (!MEMBERS.some((m) => m.name === me)) { setNote("멤버 이름으로만 저장할 수 있어요"); return; }
     try {
       const latest = await loadStore(freshStore());
       const round = latest.rounds.find((r) => r.id === latest.activeId);
@@ -711,17 +757,6 @@ export default function TasteArchive() {
     }
   };
 
-  const closeRound = async () => {
-    try {
-      const meta = await loadMeta(freshStore());
-      const n = meta.rounds.length + 1, id = nowId();
-      await saveMeta({ activeId: id, rounds: [...meta.rounds, { id, title: `${n}회차`, createdAt: Date.now() }] });
-      setStore(await loadStore(freshStore()));
-    } catch (e) { setNote(SAVE_FAIL); return; }
-    setScreen("intro");
-    setNote("새 회차를 열었어요. 이전 회차는 아카이브에 남아 있어요");
-  };
-
   const startSection = (sec) => {
     setSection(sec);
     if (sec.type === "balance") { setDraft({ ...(mine[sec.key] || {}) }); setIdx(0); setScreen("balance"); }
@@ -780,12 +815,7 @@ export default function TasteArchive() {
       else { setSection(null); setScreen("hub"); }
       return;
     }
-    if (screen === "round") {
-      if (openMember) { setOpenMember(null); return; }
-      setScreen("archive");
-      return;
-    }
-    if (screen === "archive" || screen === "result") { setScreen(me ? "hub" : "intro"); return; }
+    if (screen === "result") { setScreen(me ? "hub" : "intro"); return; }
     setSection(null);
     setScreen("hub");
   };
@@ -794,7 +824,6 @@ export default function TasteArchive() {
     <div className="bt-nav">
       <button className={screen === "intro" || screen === "hub" ? "on" : ""} onClick={() => setScreen(me ? "hub" : "intro")}>참여</button>
       <button className={screen === "result" ? "on" : ""} onClick={() => setScreen("result")}>결과</button>
-      <button className={screen === "archive" || screen === "round" ? "on" : ""} onClick={() => { setOpenRound(null); setOpenMember(null); setScreen("archive"); }}>아카이브</button>
     </div>
   );
 
@@ -805,7 +834,7 @@ export default function TasteArchive() {
         {screen !== "balance" && <Nav />}
         <div className="bt-panel">
           {screen !== "intro" && (
-            <button className="bt-back" onClick={goBack}>← 돌아가기</button>
+            <button className="bt-back" onClick={goBack}>{screen === "hub" ? "← 다른 멤버로 바꾸기" : "← 돌아가기"}</button>
           )}
           {note && <p style={{ color: "var(--led)", fontSize: 13, marginTop: 0 }}>{note}</p>}
 
@@ -870,15 +899,37 @@ export default function TasteArchive() {
                       </div>
                       <div className="bt-ptrack"><span className="bt-pfill" style={{ width: pct + "%" }} /></div>
                     </div>
-                    {stats.map(({ sec, total, done }) => (
-                      <button key={sec.key} className={"bt-list" + (done === total ? " done" : "")} onClick={() => startSection(sec)}>
-                        <strong>{sec.label}{done === total ? " ✓" : ""}</strong>
-                        <span className="bt-dim" style={{ fontSize: 13 }}>
-                          {sec.desc} · {done ? (total > 1 ? `${done}/${total} 채움` : "채움") : "아직 안 함"}
-                        </span>
-                        <span className="bt-mini"><i style={{ width: Math.round((done / total) * 100) + "%" }} /></span>
-                      </button>
-                    ))}
+                    <div className="bt-tabs" role="tablist">
+                      {[
+                        ["all", "전체", stats.length],
+                        ["todo", "남은 코너", stats.length - finished],
+                        ["done", "완료", finished],
+                      ].map(([k, label, n]) => (
+                        <button key={k} role="tab" aria-selected={hubTab === k} className={hubTab === k ? "on" : ""} onClick={() => setHubTab(k)}>
+                          {label}<b>{n}</b>
+                        </button>
+                      ))}
+                    </div>
+                    {(() => {
+                      const shown = stats.filter(({ total, done }) =>
+                        hubTab === "all" ? true : hubTab === "done" ? done === total : done < total);
+                      if (!shown.length) {
+                        return <p className="bt-empty">{hubTab === "done" ? "아직 끝낸 코너가 없어요" : "모든 코너를 끝냈어요! 🎉"}</p>;
+                      }
+                      return (
+                        <div className="bt-tiles">
+                          {shown.map(({ sec, total, done }) => (
+                            <button key={sec.key} className={"bt-tile" + (done === total ? " done" : "")} onClick={() => startSection(sec)} title={sec.desc}>
+                              {done === total && <span className="chk">✓</span>}
+                              <span className="ico">{sec.icon}</span>
+                              <span className="nm">{sec.short}</span>
+                              <span className="st">{done === total ? "완료" : done ? `${done}/${total}` : "시작 전"}</span>
+                              <span className="bt-mini"><i style={{ width: Math.round((done / total) * 100) + "%" }} /></span>
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </>
                 );
               })()}
@@ -1210,7 +1261,19 @@ export default function TasteArchive() {
                           <span className="bt-dim" style={{ fontSize: 13 }}>{q.prompt}</span>
                         </div>
                       ))}
-                      {res.split.length > 0 && <p className="bt-split" style={{ fontSize: 13.5, marginTop: 10 }}>갈린 문항 {res.split.length}개는 아카이브에서 볼 수 있어요</p>}
+                      {res.split.length > 0 && (
+                        <>
+                          <h3 style={{ marginTop: 22 }}>의견이 갈린 문항 <span className="bt-split">{res.split.length}개</span></h3>
+                          {res.split.map(({ q, aN, bN }) => (
+                            <div className="bt-card" key={q.id}>
+                              <span className="bt-tag">{q.tag}</span>
+                              <b>{q.prompt}</b>
+                              <div className="bt-side"><span>{q.a}</span><span className="bt-dim">{aN.join(", ")}</span></div>
+                              <div className="bt-side"><span>{q.b}</span><span className="bt-dim">{bN.join(", ")}</span></div>
+                            </div>
+                          ))}
+                        </>
+                      )}
                     </div>
                   ))}
 
@@ -1377,172 +1440,14 @@ export default function TasteArchive() {
                 <button className="bt-btn ghost sm" onClick={load}>새로고침</button>
                 <button className="bt-btn ghost sm" onClick={() => setScreen(me ? "hub" : "intro")}>이어서 하기</button>
               </div>
+              <div className="bt-row">
+                <button className="bt-btn ghost sm" onClick={() => copyTable(active)}>표로 복사</button>
+                <button className="bt-btn ghost sm" onClick={() => downloadCsv(active)}>CSV 받기</button>
+                <button className="bt-btn ghost sm" onClick={() => exportRound(active)}>텍스트로 복사</button>
+              </div>
             </>
           )}
 
-          {screen === "archive" && (
-            <>
-              <div className="bt-eyebrow">아카이브 · 회차 {store.rounds.length}개</div>
-              <div className="bt-title">지난 기록</div>
-              <p className="bt-p" style={{ marginBottom: 14 }}>회차를 열면 누가 뭘 골랐는지 전부 남아 있어요</p>
-              {store.rounds.slice().reverse().map((r) => (
-                <button key={r.id} className="bt-list" onClick={() => { setOpenRound(r.id); setOpenMember(null); setScreen("round"); }}>
-                  <strong>{r.title}{r.id === store.activeId ? " (진행 중)" : ""}</strong>
-                  <span className="bt-dim" style={{ fontSize: 13 }}>
-                    {fmt(r.createdAt)} · {Object.keys(r.entries).length}명 {Object.keys(r.entries).length ? "· " + Object.keys(r.entries).join(", ") : ""}
-                  </span>
-                </button>
-              ))}
-              <button className="bt-btn ghost sm" style={{ marginTop: 12 }} onClick={closeRound}>이번 회차 마감하고 새 회차 열기</button>
-            </>
-          )}
-
-          {screen === "round" && (() => {
-            const r = store.rounds.find((x) => x.id === openRound);
-            if (!r) return <p className="bt-p">회차를 찾을 수 없어요</p>;
-            const ent = r.entries, names = Object.keys(ent);
-
-            if (openMember && ent[openMember]) {
-              const E = ent[openMember], en = readPick(E, "en"), ko = readPick(E, "ko");
-              return (
-                <>
-                  <div className="bt-eyebrow">{r.title} · {openMember}</div>
-                  <div className="bt-title">{openMember}의 답</div>
-                  <p className="bt-p bt-dim" style={{ fontSize: 13 }}>{E.at ? fmt(E.at) + " 기록" : "기록 시각 없음"}</p>
-                  {[["음식 밸런스 게임", FOOD_Q, "food"]].map(([title, set, key]) => (
-                    <div className="bt-sec" key={key}>
-                      <h3>{title}</h3>
-                      {set.map((q, i) => {
-                        const p = (E[key] || {})[q.id];
-                        return (
-                          <div className="bt-card" key={q.id}>
-                            <span className="bt-tag bt-num">{String(i + 1).padStart(2, "0")} · {q.tag}</span>
-                            <b>{p ? q[p] : "무응답"}</b>
-                            <span className="bt-dim" style={{ fontSize: 13 }}>{q.prompt}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                  <div className="bt-sec">
-                    <h3>마지막 한 끼</h3>
-                    {E.lastmeal && norm(E.lastmeal.food) ? (
-                      <>
-                        <b style={{ display: "block", fontSize: 16 }}>{E.lastmeal.food}</b>
-                        {E.lastmeal.why && <div className="bt-memo">{E.lastmeal.why}</div>}
-                      </>
-                    ) : <p className="bt-p">안 적었어요</p>}
-                  </div>
-                  <div className="bt-sec">
-                    <h3>감각 취향</h3>
-                    {SENSE_GROUPS.filter((g) => norm((E.senses || {})[g.key])).length ? SENSE_GROUPS.map((g) => (
-                      norm((E.senses || {})[g.key]) ? (
-                        <div className="bt-side" key={g.key}>
-                          <span>{g.label.replace("좋아하는 ", "")}</span>
-                          <span className="bt-dim">{E.senses[g.key]}</span>
-                        </div>
-                      ) : null
-                    )) : <p className="bt-p">안 골랐어요</p>}
-                  </div>
-                  <div className="bt-sec">
-                    <h3>인생 셋</h3>
-                    {LIFE_FIELDS.filter((f) => norm((E.life || {})[f.key])).length ? LIFE_FIELDS.map((f) => (
-                      norm((E.life || {})[f.key]) ? (
-                        <div className="bt-side" key={f.key}>
-                          <span>{f.label.replace("무인도에 하나만 가져간다면", "무인도")}</span>
-                          <span className="bt-dim">{E.life[f.key]}</span>
-                        </div>
-                      ) : null
-                    )) : <p className="bt-p">안 적었어요</p>}
-                  </div>
-                  <div className="bt-sec">
-                    <h3>요즘 빠진 것</h3>
-                    {(E.likes || []).length ? (
-                      <div className="bt-chips">
-                        {E.likes.map((w) => <span className="bt-chip on" key={w}>{w}</span>)}
-                      </div>
-                    ) : <p className="bt-p">안 골랐어요</p>}
-                  </div>
-                  <div className="bt-sec">
-                    <h3>가치 단어 5개</h3>
-                    {(E.values || []).length ? (
-                      <div className="bt-chips">
-                        {E.values.map((w) => <span className="bt-chip on" key={w}>{w}</span>)}
-                      </div>
-                    ) : <p className="bt-p">안 골랐어요</p>}
-                  </div>
-                  <div className="bt-sec">
-                    <h3>글자와 숫자</h3>
-                    <div className="bt-side">
-                      <span>좋아하는 숫자</span>
-                      <span className="bt-dim">{E.num && norm(E.num.n) ? E.num.n : "안 적었어요"}</span>
-                    </div>
-                    {[["A부터 Z까지", en], ["ㄱ부터 ㅎ까지", ko]].map(([label, v]) => (
-                      <div key={label} style={{ marginTop: 10 }}>
-                        <span className="bt-tag">{label}</span>
-                        {norm(v.item) ? (
-                          <>
-                            <b style={{ display: "block", fontSize: 16, marginTop: 4 }}>{v.letter} · {v.item}</b>
-                            {v.memo && <div className="bt-memo">{v.memo}</div>}
-                          </>
-                        ) : <p className="bt-p">안 골랐어요</p>}
-                      </div>
-                    ))}
-                  </div>
-                  <button className="bt-btn ghost sm" style={{ marginTop: 16 }} onClick={() => setOpenMember(null)}>회차로 돌아가기</button>
-                </>
-              );
-            }
-
-            return (
-              <>
-                <div className="bt-eyebrow">{fmt(r.createdAt)} · {names.length}명</div>
-                <div className="bt-title">{r.title}</div>
-                <div className="bt-sec">
-                  <h3>멤버별 기록</h3>
-                  {names.length === 0 && <p className="bt-p">아직 참여한 멤버가 없어요</p>}
-                  {names.map((m) => {
-                    const filled = SECTIONS.filter((s) => doneCount(ent[m], s) > 0).map((s) => s.label);
-                    return (
-                      <button key={m} className="bt-list" onClick={() => setOpenMember(m)}>
-                        <strong>{m}</strong>
-                        <span className="bt-dim" style={{ fontSize: 13 }}>
-                          {filled.length ? filled.join(", ") : "기록 없음"} {ent[m].at ? "· " + fmt(ent[m].at) : ""}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                {names.length >= 2 && [["음식 밸런스 게임", FOOD_Q, "food"]].map(([title, set, key]) => (
-                  <div className="bt-sec" key={key}>
-                    <h3>{title} 문항별 선택</h3>
-                    {set.map((q, i) => {
-                      const aN = names.filter((m) => (ent[m][key] || {})[q.id] === "a");
-                      const bN = names.filter((m) => (ent[m][key] || {})[q.id] === "b");
-                      if (!aN.length && !bN.length) return null;
-                      const all = aN.length === 0 || bN.length === 0;
-                      return (
-                        <div className="bt-card" key={q.id}>
-                          <span className="bt-tag bt-num">{String(i + 1).padStart(2, "0")} · {q.tag}{all ? " · 전원 일치" : ""}</span>
-                          <b>{q.prompt}</b>
-                          <div className="bt-side"><span>{q.a}</span><span className="bt-dim">{aN.join(", ") || "없음"}</span></div>
-                          <div className="bt-side"><span>{q.b}</span><span className="bt-dim">{bN.join(", ") || "없음"}</span></div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-                <div className="bt-row">
-                  <button className="bt-btn ghost sm" onClick={() => copyTable(r)}>표로 복사</button>
-                  <button className="bt-btn ghost sm" onClick={() => downloadCsv(r)}>CSV 받기</button>
-                </div>
-                <div className="bt-row">
-                  <button className="bt-btn ghost sm" onClick={() => exportRound(r)}>텍스트로 복사</button>
-                  <button className="bt-btn ghost sm" onClick={() => setScreen("archive")}>목록으로</button>
-                </div>
-              </>
-            );
-          })()}
         </div>
       </div>
     </div>

@@ -1,12 +1,18 @@
 rules_version = '2';
 
 // 밴드 멤버끼리 쓰는 앱이라 로그인 없이 접근한다.
-// 멤버마다 문서 하나, 회차 목록은 _meta 문서. 서로 결과를 봐야 해서 목록 조회까지 열고, 삭제만 막는다.
+// 멤버마다 문서 하나, 회차 목록은 _meta 문서. 서로 결과를 봐야 해서 목록 조회까지 열고, 삭제는 막는다.
+// 쓰기는 여섯 멤버 이름(과 _meta) 문서에만, data 문자열 필드 하나로만 허용한다.
+// 멤버가 바뀌면 src/App.jsx의 MEMBERS와 이 목록을 같이 고친다.
 service cloud.firestore {
   match /databases/{database}/documents {
 
     match /bandtaste/{member} {
-      allow get, list, create, update: if true;
+      allow get, list: if true;
+      allow create, update: if member in ['동진', '원택', '현아', '다연', '운', '수영', '_meta']
+        && request.resource.data.keys().hasOnly(['data'])
+        && request.resource.data.data is string
+        && request.resource.data.data.size() < 200000;
       allow delete: if false;
     }
 
